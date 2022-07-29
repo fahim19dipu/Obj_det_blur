@@ -10,6 +10,9 @@ import os
 from datetime import datetime 
 import numpy as np
 from tkinter import messagebox
+import tensorflow as tf
+from tensorflow_estimator.python.estimator.canned.dnn import dnn_logit_fn_builder
+import tensorflow_hub as hub
 
 def detection_function():
     path=root.filename
@@ -30,9 +33,14 @@ def detection_function():
 
     file_name= os.path.join(os.getcwd(),'Output',  datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
     
-    
-    im1 = blured.save(file_name+".jpg")
-    res="The image is saved at "+str(os.getcwd())
+    try:
+        im1 = blured.save(file_name+".jpg")
+    except FileNotFoundError:
+        newdir = os.path.join(os.getcwd(),'Output')
+        os.mkdir(newdir)
+        im1 = blured.save(file_name+".jpg")
+        
+    res="The image is saved at "+str(os.getcwd())+"\Output"
     #from tkinter import messagebox
     messagebox.showinfo("Output", res)
     root.destroy()
@@ -58,7 +66,7 @@ def importImages2(event):
         try:
             image=Image.open(root.filename)
             global box_list, class_list, score_list
-            image, box_list, class_list, score_list = det.objts(image)
+            image, box_list, class_list, score_list = det.objts(image,detector)
             print(class_list)
             # for i in range(len(box_list)):
             #     print("{} {} {}".format(class_list[i], score_list[i],box_list[i]))
@@ -93,8 +101,6 @@ def importImages2(event):
         except OSError:
             messagebox.showinfo("Error", "Not an image")
             refresh1()
-        
-    
         
 def window():       
     global root
@@ -147,4 +153,14 @@ def window():
     label2.place(x=550, y=30, anchor="center")
     
     root.mainloop()
+os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.6/bin")
+print(tf.__version__)
+# Check available GPU devices.
+print("The following GPU devices are available: %s" % tf.test.gpu_device_name())
+"""
+        Change based on the location of downloaded detector module
+"""
+global detector
+detector = hub.load(r"F:\Object detection\resources\openimages_v4_ssd_mobilenet_v2_1.tar\openimages_v4_ssd_mobilenet_v2_1").signatures['default']
+    
 window()
