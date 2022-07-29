@@ -48,7 +48,7 @@ def detection_function():
     
     #from tkinter import messagebox
     ans = messagebox.askquestion('Save Image', 
-                         'Do you want to Save teh image?')
+                         'Do you want to save the image?')
       
     if ans == 'yes' :
         file_name= os.path.join(os.getcwd(),'Output',  datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
