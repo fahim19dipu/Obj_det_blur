@@ -33,18 +33,42 @@ def detection_function():
 
     file_name= os.path.join(os.getcwd(),'Output',  datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
     
-    try:
-        im1 = blured.save(file_name+".jpg")
-    except FileNotFoundError:
-        newdir = os.path.join(os.getcwd(),'Output')
-        os.mkdir(newdir)
-        im1 = blured.save(file_name+".jpg")
+    # try:
+    #     im1 = blured.save(file_name+".jpg")
+    # except FileNotFoundError:
+    #     newdir = os.path.join(os.getcwd(),'Output')
+    #     os.mkdir(newdir)
+    #     im1 = blured.save(file_name+".jpg")
         
-    res="The image is saved at "+str(os.getcwd())+"\Output"
+    img = blured.resize((900, 650))
+    img = ImageTk.PhotoImage(img)
+    panel.configure(image=img)
+    panel.image = img
+    
+    
     #from tkinter import messagebox
-    messagebox.showinfo("Output", res)
-    root.destroy()
-    window()
+    ans = messagebox.askquestion('Save Image', 
+                         'Do you want to Save teh image?')
+      
+    if ans == 'yes' :
+        file_name= os.path.join(os.getcwd(),'Output',  datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+        
+        try:
+            im1 = blured.save(file_name+".jpg")
+
+        except FileNotFoundError:
+            newdir = os.path.join(os.getcwd(),'Output')
+            os.mkdir(newdir)
+            im1 = blured.save(file_name+".jpg")
+        res="The image is saved at "+str(os.getcwd())+"\Output"
+        messagebox.showinfo("Output", res)
+          
+    else :
+        messagebox.showinfo('Return', 'Returning to main application')
+        
+
+    #root.destroy()
+    #window()
     
 def create_window():
     window = tk.Toplevel(root) 
@@ -74,6 +98,7 @@ def importImages2(event):
             image=image.resize((900, 650))
             img = ImageTk.PhotoImage(image)
             ###############################################
+            global panel
             panel = tk.Label(bottomframe, image = img)
             panel.image = img
             #panel.pack(side = "bottom", fill = "both", expand = "yes")
