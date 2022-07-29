@@ -9,8 +9,6 @@ Image is then blurred using Pillow ImageFilter.
 The project uses follwing libraries: tensorflow, tensorflow_hub, numpy, Pillow, matplotlib, six, time, tkinter, os, datetime, tempfile. Thay can be insalled manually or by using the [requirement file](requirements.txt). Then download the object detection module from [here](https://tfhub.dev/google/openimages_v4/ssd/mobilenet_v2/1) and extact the folder. Set the path of the extracted folder in **objts** method in this [module](Obj_det.py). 
 
 ## Running the project
-Run the project by running the **UI.py** file. Select the desired image by clicking **Import Image** buttton. After clicking the button it will take a little bit of time to load and detect the objects from the image. After compeleting detection the image drawn boxes highlighting all detected objects along with the names of the obaject will aprear on the UI Under Preview section. 
+Run the project by running the **UI.py** file. It will take some time to open the UI due to loadinf the model. After opening select the desired image for object detection by clicking **Import Image** buttton from the left panel. After that the loaded model will detect the objects from the image. After compeleting detection the image with drawn boxes highlighting all detected objects along with the names of the objects will aprear on the UI Under Preview section. 
 A dropdown menu containg all the object names and a button named **Apply Blur** wil also aprear. Clicking **Apply Blur** button after selecting an object from the dropdown menu  will result in an image where everything except the selected object is blurred will be saved in in your local disk.
-
-
-
+To create a new session at any time, click on the **Refesh** Button on the left panel.
