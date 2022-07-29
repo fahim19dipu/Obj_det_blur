@@ -81,13 +81,7 @@ def run_detector(detector, path):
 
 
 
-def objts(image):
-    print(tf.__version__)
-    
-    # Check available GPU devices.
-    print("The following GPU devices are available: %s" % tf.test.gpu_device_name())
-
-    detector = hub.load(r"F:\Object detection\resources\openimages_v4_ssd_mobilenet_v2_1.tar\openimages_v4_ssd_mobilenet_v2_1").signatures['default']
+def objts(image, detector):
     
     pil_image = image
     downloaded_image_path = ii.load_and_resize_image(pil_image, 1280, 856, False)
