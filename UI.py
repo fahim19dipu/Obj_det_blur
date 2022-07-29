@@ -1,6 +1,4 @@
 #The image modifier functions
-
-
 from tkinter import filedialog
 from tkinter import *
 import tkinter as tk
@@ -13,7 +11,19 @@ from tkinter import messagebox
 import tensorflow as tf
 from tensorflow_estimator.python.estimator.canned.dnn import dnn_logit_fn_builder
 import tensorflow_hub as hub
+def save_img():
+    file_name= os.path.join(os.getcwd(),'Output',  datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+    try:
+        im1 = blured.save(file_name+".jpg")
 
+    except FileNotFoundError:
+        newdir = os.path.join(os.getcwd(),'Output')
+        os.mkdir(newdir)
+        im1 = blured.save(file_name+".jpg")
+    res="The image is saved at "+str(os.getcwd())+"\Output"
+    messagebox.showinfo("Output", res)
+    button22.destroy()
+          
 def detection_function():
     path=root.filename
 
@@ -27,11 +37,11 @@ def detection_function():
                                     ymin * im_height, ymax * im_height)
 
     croped = image.crop((int(left), int(top), int(right), int(bottom)))
+    global blured
     blured = image.filter(ImageFilter.GaussianBlur(radius=17))
     blured.paste(croped,((int(left), int(top), int(right), int(bottom))))
     #blured.show()   
 
-    file_name= os.path.join(os.getcwd(),'Output',  datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
     
     # try:
     #     im1 = blured.save(file_name+".jpg")
@@ -45,26 +55,21 @@ def detection_function():
     panel.configure(image=img)
     panel.image = img
     
+    global button22
+    button22 = tk.Button(root,text="Save Image",bg = '#537487',fg = '#FFFFFF',command=save_img,height =2 , width = 10)
+    button22.config(font=("Helvetica", 13))
+    button22.place(x=1300, y=450,anchor="center")
     
     #from tkinter import messagebox
-    ans = messagebox.askquestion('Save Image', 
-                         'Do you want to save the image?')
+    # ans = messagebox.askquestion('Save Image', 
+    #                      'Do you want to save the image?')
       
-    if ans == 'yes' :
-        file_name= os.path.join(os.getcwd(),'Output',  datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+    # if ans == 'yes' :
+    #     file_name= os.path.join(os.getcwd(),'Output',  datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
         
-        try:
-            im1 = blured.save(file_name+".jpg")
 
-        except FileNotFoundError:
-            newdir = os.path.join(os.getcwd(),'Output')
-            os.mkdir(newdir)
-            im1 = blured.save(file_name+".jpg")
-        res="The image is saved at "+str(os.getcwd())+"\Output"
-        messagebox.showinfo("Output", res)
-          
-    else :
-        messagebox.showinfo('Return', 'Returning to main application')
+    # else :
+    #     messagebox.showinfo('Return', 'Returning to main application')
         
 
     #root.destroy()
@@ -115,13 +120,22 @@ def importImages2(event):
             # Create Dropdown menu
             drop = OptionMenu( root , clicked , *options)
             drop.config(bg = "#537487", fg ='#FFFFFF')
-            drop.config(font=("Helvetica", 11))
+            drop.config(font=("Helvetica", 13))
             drop.place(x=1250, y=300, anchor="center")
                         
             #################################################
             button2 = tk.Button(root,text="Apply Blur",bg = '#537487',fg = '#FFFFFF',command=detection_function,height =2 , width = 10)
-            button2.config(font=("Helvetica", 11))
+            button2.config(font=("Helvetica", 13))
             button2.place(x=1400, y=300,anchor="center")
+            
+            ######################################################
+            label22 = tk.Label(bottomframe,text="Select Object ",bg='Pale Turquoise3')
+            label22.config(font=("Helvetica", 16))
+            #label2.grid(row = 0,column=10,padx=210,pady=10)
+            label22.place(x=1000, y=250, anchor="center")
+            ###############################################################
+
+            
 
         except OSError:
             messagebox.showinfo("Error", "Not an image")
@@ -178,6 +192,8 @@ def window():
     label2.place(x=550, y=30, anchor="center")
     
     root.mainloop()
+    
+######################         Drive    
 os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.6/bin")
 print(tf.__version__)
 # Check available GPU devices.
