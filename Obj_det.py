@@ -2,7 +2,7 @@
 """
 Created on Thu Jul 28 09:47:16 2022
 
-@author: user
+@author: Fahim
 """
 
 #@title Imports and function definitions
@@ -11,7 +11,6 @@ Created on Thu Jul 28 09:47:16 2022
 import tensorflow as tf
 from tensorflow_estimator.python.estimator.canned.dnn import dnn_logit_fn_builder
 import tensorflow_hub as hub
-
 import Image_import as ii
 import Drawing_box as db
 # For measuring the inference time.
@@ -19,9 +18,9 @@ import time
 import numpy as np
 
 # Print Tensorflow version
-
+""" format the classes, boxes and score for returning"""
 def get_res( boxes, class_names, scores, max_boxes=10, min_score=0.1):
-  """Overlay labeled boxes on an image with formatted scores and label names."""
+
   box_list = []
   class_list= []
   score_list = []
@@ -39,11 +38,9 @@ def get_res( boxes, class_names, scores, max_boxes=10, min_score=0.1):
               c = c+1
               class_list[j] = class_list[j] + "-"+str(c)
     
-  #print(class_list)
-    
   return box_list, class_list, score_list
 
-
+""" running the detector"""
 def run_detector(detector, path):
   img = ii.load_img(path)
 
@@ -79,8 +76,7 @@ def run_detector(detector, path):
   
   return image_with_boxes, box_list, class_list, score_list
 
-
-
+""" running detection """ 
 def objts(image, detector):
     
     pil_image = image
@@ -89,3 +85,4 @@ def objts(image, detector):
     image_with_boxes, box_list, class_list, score_list = run_detector(detector, downloaded_image_path)
     
     return image_with_boxes, box_list, class_list, score_list
+  
