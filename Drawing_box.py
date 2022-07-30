@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jul 28 09:54:01 2022
+Created on Thu Jul 29 09:54:01 2022
 
-@author: user
+@author: fahim
 """
-from PIL import Image
-from PIL import ImageColor
-from PIL import ImageDraw
-from PIL import ImageFont
+from PIL import Image, ImageColor, ImageDraw, ImageFont
 import numpy as np
 
-
-
+"""Drawing boxes only on selected objects"""
 def draw_bounding_box_on_image(image,
                                ymin,
                                xmin,
@@ -55,9 +51,9 @@ def draw_bounding_box_on_image(image,
               font=font)
     text_bottom -= text_height - 2 * margin
 
-
-def draw_boxes(image, boxes, class_names, scores, max_boxes=10, min_score=0.1):
   """Overlay labeled boxes on an image with formatted scores and label names."""
+def draw_boxes(image, boxes, class_names, scores, max_boxes=10, min_score=0.1):
+
   colors = list(ImageColor.colormap.values())
   try:
       font = ImageFont.truetype(fontsize= 15)
