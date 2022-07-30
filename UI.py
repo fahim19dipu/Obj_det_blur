@@ -1,18 +1,51 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Jul 30 20:45:20 2022
+
+@author: user
+"""
+
 #The image modifier functions
 from tkinter import filedialog
 from tkinter import *
 import tkinter as tk
+from tkinter import ttk
 from PIL import ImageTk, Image, ImageFilter
 import Obj_det as det
 import os 
+import time
 from datetime import datetime 
 import numpy as np
 from tkinter import messagebox
 import tensorflow as tf
+import threading
+
 from tensorflow_estimator.python.estimator.canned.dnn import dnn_logit_fn_builder
 import tensorflow_hub as hub
+
+
+def load_hub():
+    os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.6/bin")
+    print(tf.__version__)
+    # Check available GPU devices.
+    print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+    print("The following GPU devices are available: %s" % tf.test.gpu_device_name())
+    """
+            Change based on the location of downloaded detector module
+            faster_rcnn_openimages_v4_inception_resnet_v2_1
+            openimages_v4_ssd_mobilenet_v2_1
+    """
+    global detector
+    start_time = time.time()
+    print("loading started")
+    detector = hub.load(r"F:\Object detection\resources\openimages_v4_ssd_mobilenet_v2_1.tar\openimages_v4_ssd_mobilenet_v2_1").signatures['default']
+    end_time = time.time()    
+
+    print("Module loading time: ", end_time-start_time)
+    
 def save_img():
     file_name= os.path.join(os.getcwd(),'Output',  datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+    
     try:
         im1 = blured.save(file_name+".jpg")
 
@@ -41,14 +74,6 @@ def detection_function():
     blured = image.filter(ImageFilter.GaussianBlur(radius=17))
     blured.paste(croped,((int(left), int(top), int(right), int(bottom))))
     #blured.show()   
-
-    
-    # try:
-    #     im1 = blured.save(file_name+".jpg")
-    # except FileNotFoundError:
-    #     newdir = os.path.join(os.getcwd(),'Output')
-    #     os.mkdir(newdir)
-    #     im1 = blured.save(file_name+".jpg")
         
     img = blured.resize((900, 650))
     img = ImageTk.PhotoImage(img)
@@ -59,22 +84,7 @@ def detection_function():
     button22 = tk.Button(root,text="Save Image",bg = '#537487',fg = '#FFFFFF',command=save_img,height =2 , width = 10)
     button22.config(font=("Helvetica", 13))
     button22.place(x=1300, y=450,anchor="center")
-    
-    #from tkinter import messagebox
-    # ans = messagebox.askquestion('Save Image', 
-    #                      'Do you want to save the image?')
-      
-    # if ans == 'yes' :
-    #     file_name= os.path.join(os.getcwd(),'Output',  datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
-        
-
-    # else :
-    #     messagebox.showinfo('Return', 'Returning to main application')
-        
-
-    #root.destroy()
-    #window()
-    
+       
 def create_window():
     window = tk.Toplevel(root) 
     
@@ -121,18 +131,18 @@ def importImages2(event):
             drop = OptionMenu( root , clicked , *options)
             drop.config(bg = "#537487", fg ='#FFFFFF')
             drop.config(font=("Helvetica", 13))
-            drop.place(x=1250, y=300, anchor="center")
+            drop.place(x=1275, y=300, anchor="center")
                         
             #################################################
             button2 = tk.Button(root,text="Apply Blur",bg = '#537487',fg = '#FFFFFF',command=detection_function,height =2 , width = 10)
             button2.config(font=("Helvetica", 13))
-            button2.place(x=1400, y=300,anchor="center")
+            button2.place(x=1450, y=300,anchor="center")
             
             ######################################################
             label22 = tk.Label(bottomframe,text="Select Object ",bg='Pale Turquoise3')
             label22.config(font=("Helvetica", 16))
             #label2.grid(row = 0,column=10,padx=210,pady=10)
-            label22.place(x=1000, y=250, anchor="center")
+            label22.place(x=1030, y=250, anchor="center")
             ###############################################################
 
             
@@ -140,20 +150,51 @@ def importImages2(event):
         except OSError:
             messagebox.showinfo("Error", "Not an image")
             refresh1()
-        
-def window():       
+
+# Function to check state of thread1 and to update progressbar #
+def progress(thread):
+    # starts thread #
+    thread.start()
+    width = root1.winfo_screenwidth()
+    height = root1.winfo_screenheight()
+    root1.geometry('+%d+%d' % (width*0.45, height*0.4))
+    # defines indeterminate progress bar (used while thread is alive) #
+    pb1 = ttk.Progressbar(root1, orient='horizontal', mode='indeterminate')
+
+    # defines determinate progress bar (used when thread is dead) #
+ 
+    label13 = tk.Label(root1,text="Loading Module",bg='Pale Turquoise2')
+    label13.config(font=("Helvetica", 13))
+    #label1.grid(row=0,column=0,padx=20,pady=20)
+    
+    # places and starts progress bar #
+    pb1.pack(pady =20, padx =20)
+    label13.pack( padx =20)
+
+    pb1.start()
+
+    # checks whether thread is alive #
+    while thread.is_alive():
+        root1.update()
+        pass
+
+    # once thread is no longer active, remove pb1 and place the '100%' progress bar #
+    pb1.destroy()
+    root1.destroy()
+    #pb2.pack()
+
+       
+def window(): 
     global root
     root = tk.Tk()
-    root.title("Detection")
-    root.geometry("1920x1080")
+    root.title("Object Blurring")
+    #root.geometry("1920x1080+"% (width*0.5, height*0.5))
+    root.geometry('%dx%d+%d+%d' % (1920, 1080, 0, 0))
     root.configure(background='gray40')
     ########---------------------Manu bar-------------------######################
     
     menu = Menu(root)
     root.config(menu=menu)
-    
-    
-    ######################################################
 
     ############################################################################################################
     global topframe
@@ -167,18 +208,11 @@ def window():
     label1.config(font=("Helvetica", 13))
     #label1.grid(row=0,column=0,padx=20,pady=20)
     label1.place(x=120, y=30, anchor="center")
-    #
-    
-    #button1 = tk.Button(topframe,text="Import")
-    #button1.bind("<Button-1>",importImages)
-    #button1.pack()
     
     button = Button(topframe, text="Import image", height =2, width = 12,bg="#0096C7")
     #img = PhotoImage(file="E:/ml/1-Project/import_test.png") # make sure to add "/" not "\"
     button.config(font=("Helvetica", 11))
     button.bind("<Button-1>",importImages2)
-    #button.pack() # Displaying the button
-    #button.grid(row=1 ,column=0)
     button.place(x=100, y=90, anchor="center")
     
     button6= tk.Button(topframe,text="Refresh",bg="#0096C7",height =2 , width = 12)
@@ -190,18 +224,11 @@ def window():
     label2.config(font=("Helvetica", 17))
     #label2.grid(row = 0,column=10,padx=210,pady=10)
     label2.place(x=550, y=30, anchor="center")
-    
     root.mainloop()
     
 ######################         Drive    
-os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.6/bin")
-print(tf.__version__)
-# Check available GPU devices.
-print("The following GPU devices are available: %s" % tf.test.gpu_device_name())
-"""
-        Change based on the location of downloaded detector module
-"""
-global detector
-detector = hub.load(r"F:\Object detection\resources\openimages_v4_ssd_mobilenet_v2_1.tar\openimages_v4_ssd_mobilenet_v2_1").signatures['default']
-    
+global root1
+root1 = tk.Tk()
+thread1 = threading.Thread(target=load_hub) 
+work = progress(thread1)
 window()
