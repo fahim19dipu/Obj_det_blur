@@ -23,7 +23,7 @@ import threading
 from tensorflow_estimator.python.estimator.canned.dnn import dnn_logit_fn_builder
 import tensorflow_hub as hub
 
-
+""" load object detection module"""
 def load_hub():
     os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.6/bin")
     print(tf.__version__)
@@ -43,6 +43,7 @@ def load_hub():
 
     print("Module loading time: ", end_time-start_time)
     
+"""save image in disk"""    
 def save_img():
     file_name= os.path.join(os.getcwd(),'Output',  datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
     
@@ -56,13 +57,14 @@ def save_img():
     res="The image is saved at "+str(os.getcwd())+"\Output"
     messagebox.showinfo("Output", res)
     button22.destroy()
-          
-def detection_function():
+    
+""" Apply the blur function"""           
+def blur_function():
     path=root.filename
 
     clss = clicked.get()
     index = class_list.index(clss)
-    image= Image.open(path)
+    image= Image.open(path).convert("RGB")
     im_width, im_height = image.size
 
     (ymin, xmin, ymax, xmax) = box_list[index]
@@ -85,9 +87,10 @@ def detection_function():
     button22.config(font=("Helvetica", 13))
     button22.place(x=1300, y=450,anchor="center")
        
+
+""" create and refresh window"""
 def create_window():
     window = tk.Toplevel(root) 
-    
 def refresh(self):
     root.destroy()
     window()
@@ -97,12 +100,15 @@ def refresh1():
 def client_exit():
         root.destroy()
         
-def importImages2(event):
         
+""" import and detect objects from image"""        
+def importImages2(event):
+        #root.update()
         root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("all files","*.*"),("JEPG files","*.jpg"),("png files","*.png")))
         #print(root.filename)
         #image=Image.open(root.filename)
         try:
+            
             image=Image.open(root.filename)
             global box_list, class_list, score_list
             image, box_list, class_list, score_list = det.objts(image,detector)
@@ -119,8 +125,6 @@ def importImages2(event):
             #panel.pack(side = "bottom", fill = "both", expand = "yes")
             panel.place(x=475, y=400, anchor="center")
             ###############################################
-             
-            #datatype of menu text
             global clicked 
             clicked = tk.StringVar(root)
             options = class_list
@@ -134,7 +138,7 @@ def importImages2(event):
             drop.place(x=1275, y=300, anchor="center")
                         
             #################################################
-            button2 = tk.Button(root,text="Apply Blur",bg = '#537487',fg = '#FFFFFF',command=detection_function,height =2 , width = 10)
+            button2 = tk.Button(root,text="Apply Blur",bg = '#537487',fg = '#FFFFFF',command=blur_function,height =2 , width = 10)
             button2.config(font=("Helvetica", 13))
             button2.place(x=1450, y=300,anchor="center")
             
@@ -143,23 +147,21 @@ def importImages2(event):
             label22.config(font=("Helvetica", 16))
             #label2.grid(row = 0,column=10,padx=210,pady=10)
             label22.place(x=1030, y=250, anchor="center")
-            ###############################################################
-
-            
-
+            ###############################################################       
         except OSError:
             messagebox.showinfo("Error", "Not an image")
             refresh1()
 
-# Function to check state of thread1 and to update progressbar #
+"""Function to check state of loading hub and to update progressbar """
 def progress(thread):
     # starts thread #
     thread.start()
     width = root1.winfo_screenwidth()
     height = root1.winfo_screenheight()
+    root1.title("loading")
     root1.geometry('+%d+%d' % (width*0.45, height*0.4))
     # defines indeterminate progress bar (used while thread is alive) #
-    pb1 = ttk.Progressbar(root1, orient='horizontal', mode='indeterminate')
+    pb1 = ttk.Progressbar(root1, orient='horizontal', mode='indeterminate', length = 200 )
 
     # defines determinate progress bar (used when thread is dead) #
  
@@ -183,7 +185,7 @@ def progress(thread):
     root1.destroy()
     #pb2.pack()
 
-       
+""" Creating main UI"""       
 def window(): 
     global root
     root = tk.Tk()
@@ -227,6 +229,7 @@ def window():
     root.mainloop()
     
 ######################         Drive    
+""" create loading screen"""
 global root1
 root1 = tk.Tk()
 thread1 = threading.Thread(target=load_hub) 
